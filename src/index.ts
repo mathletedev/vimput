@@ -66,6 +66,16 @@ const NORMAL_KEYBINDINGS: Record<
 		let prevWord = input.value.lastIndexOf(" ", caret - 2) + 1;
 		if (prevWord === 0) return setCaret(input, 0);
 		setCaret(input, prevWord);
+	},
+	x: ({ input }) => {
+		const caret = input.selectionStart;
+		if (caret === null) return;
+
+		input.value = input.value.slice(0, caret) + input.value.slice(caret + 1);
+		setCaret(
+			input,
+			caret === input.value.length ? input.value.length - 1 : caret
+		);
 	}
 };
 
