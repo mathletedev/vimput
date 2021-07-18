@@ -1,0 +1,26 @@
+{
+	"name": "vimput",
+	"version": "1.0.0",
+	"description": "Vim emulation in browsers",
+	"scripts": {
+		"watch": "tsc -w"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mathletedev/vimput.git"
+	},
+	"author": {
+		"name": "mathletedev",
+		"email": "mathletedev@gmail.com"
+	},
+	"license": "Apache-2.0",
+	"private": true,
+	"bugs": {
+		"url": "https://github.com/mathletedev/vimput/issues"
+	},
+	"homepage": "https://github.com/mathletedev/vimput#readme",
+	"devDependencies": {
+		"@types/chrome": "^0.0.147",
+		"typescript": "^4.3.5"
+	}
+}
