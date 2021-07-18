@@ -2,7 +2,12 @@
 
 > Vim emulation in browsers
 
-## Installation
+## Installation (Source Code)
+
+- Go to [the releases page](https://github.com/mathletedev/vimput/releases) and click on `vimput-x.y.z.zip`
+- Navigate to your downloads folder and extract the files into a new folder called `vimput`
+
+## Installation (GitHub Repository)
 
 Clone the repository
 
@@ -33,7 +38,7 @@ tsc
 
 - Go to `chrome://extensions`
 - Click `Load unpacked`
-- Navigate to `cloned_repo/lib`
+- Navigate to `vimput` if you installed the source code, or `cloned_repo/lib` if you installed vimput from Git
 - Click `Select Folder`
 - Refresh Chrome
 
