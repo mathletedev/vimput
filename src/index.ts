@@ -37,8 +37,8 @@ const NORMAL_KEYBINDINGS: Record<
 	a: ({ input, id }) => {
 		if (input.selectionStart === null) return;
 
-		const position = input.selectionStart + 1;
-		input.setSelectionRange(position, position);
+		const caret = input.selectionStart + 1;
+		input.setSelectionRange(caret, caret);
 
 		inputStates[id] = "insert";
 		input.classList.remove("vimput-normal");
@@ -50,7 +50,23 @@ const NORMAL_KEYBINDINGS: Record<
 		input.classList.remove("vimput-normal");
 	},
 	"0": ({ input }) => setCaret(input, 0),
-	$: ({ input }) => setCaret(input, input.value.length)
+	$: ({ input }) => setCaret(input, input.value.length),
+	w: ({ input }) => {
+		const caret = input.selectionStart;
+		if (caret === null) return;
+
+		let nextWord = input.value.indexOf(" ", caret) + 1;
+		if (nextWord === 0) return setCaret(input, input.value.length - 1);
+		setCaret(input, nextWord);
+	},
+	b: ({ input }) => {
+		const caret = input.selectionStart;
+		if (caret === null) return;
+
+		let prevWord = input.value.lastIndexOf(" ", caret - 2) + 1;
+		if (prevWord === 0) return setCaret(input, 0);
+		setCaret(input, prevWord);
+	}
 };
 
 for (let i = 0; i < inputs.length; i++) {
@@ -68,11 +84,8 @@ for (let i = 0; i < inputs.length; i++) {
 			e.preventDefault();
 
 			if (inputStates[i] === "insert") {
-				if (input.selectionStart === input.value.length)
-					input.setSelectionRange(
-						input.value.length - 1,
-						input.value.length - 1
-					);
+				const caret = input.selectionStart;
+				input.setSelectionRange((caret || 0) - 1, (caret || 0) - 1);
 
 				input.classList.add("vimput-normal");
 				inputStates[i] = "normal";
@@ -98,5 +111,12 @@ for (let i = 0; i < inputs.length; i++) {
 			pressedModifiers.delete(e.key);
 			return;
 		}
+	});
+
+	input.addEventListener("click", () => {
+		const caret = input.selectionStart;
+
+		if (caret === input.value.length)
+			input.setSelectionRange(input.value.length - 1, input.value.length - 1);
 	});
 }
