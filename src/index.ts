@@ -2,7 +2,7 @@ const inputs = <NodeListOf<HTMLInputElement>>(
 	document.querySelectorAll('input[type="text"]')
 );
 
-let inputStates: Record<number, string> = {};
+let inputStates: Record<number, "normal" | "insert"> = {};
 
 const MODIFIERS: Record<string, string> = {
 	Control: "^"
@@ -84,49 +84,55 @@ for (let i = 0; i < inputs.length; i++) {
 
 	inputStates[i] = "insert";
 
-	input.addEventListener("keydown", (e) => {
-		if (Object.keys(MODIFIERS).includes(e.key)) {
-			pressedModifiers.add(e.key);
-			return;
-		}
+	input.addEventListener(
+		"keydown",
+		(e) => {
+			e.stopPropagation();
 
-		if (e.key === "Escape") {
-			e.preventDefault();
-
-			if (inputStates[i] === "insert") {
-				const caret = input.selectionStart;
-				input.setSelectionRange((caret || 0) - 1, (caret || 0) - 1);
-
-				input.classList.add("vimput-normal");
-				inputStates[i] = "normal";
+			if (
+				inputStates[i] === "normal" &&
+				input.selectionStart === input.value.length
+			) {
+				setCaret(input, input.value.length - 1);
 			}
 
-			return;
-		}
+			if (Object.keys(MODIFIERS).includes(e.key)) {
+				pressedModifiers.add(e.key);
+				return;
+			}
 
-		if (inputStates[i] === "insert") return;
-		e.preventDefault();
+			if (e.key === "Escape") {
+				e.preventDefault();
 
-		let key = "";
+				if (inputStates[i] === "insert") {
+					const caret = input.selectionStart;
+					setCaret(input, (caret || 0) - 1);
 
-		for (const modifier of Array.from(pressedModifiers).sort())
-			key += MODIFIERS[modifier];
-		key += e.key;
+					input.classList.add("vimput-normal");
+					inputStates[i] = "normal";
+				}
 
-		if (key in NORMAL_KEYBINDINGS) NORMAL_KEYBINDINGS[key]({ input, id: i });
-	});
+				return;
+			}
+
+			if (inputStates[i] === "insert") return;
+			e.preventDefault();
+
+			let key = "";
+
+			for (const modifier of Array.from(pressedModifiers).sort())
+				key += MODIFIERS[modifier];
+			key += e.key;
+
+			if (key in NORMAL_KEYBINDINGS) NORMAL_KEYBINDINGS[key]({ input, id: i });
+		},
+		{ capture: true }
+	);
 
 	input.addEventListener("keyup", (e) => {
 		if (Object.keys(MODIFIERS).includes(e.key)) {
 			pressedModifiers.delete(e.key);
 			return;
 		}
-	});
-
-	input.addEventListener("click", () => {
-		const caret = input.selectionStart;
-
-		if (caret === input.value.length)
-			input.setSelectionRange(input.value.length - 1, input.value.length - 1);
 	});
 }
