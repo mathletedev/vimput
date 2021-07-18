@@ -26,7 +26,7 @@ const setCaret = (input: HTMLInputElement, position: number) => {
 
 const NORMAL_KEYBINDINGS: Record<
 	string,
-	({ input, id }: { input: HTMLInputElement; id: number }) => any
+	({ input, id }: { input: HTMLInputElement; id: number; caret: number }) => any
 > = {
 	h: ({ input }) => moveCaret(input, -1),
 	l: ({ input }) => moveCaret(input, 1),
@@ -34,11 +34,8 @@ const NORMAL_KEYBINDINGS: Record<
 		inputStates[id] = "insert";
 		input.classList.remove("vimput-normal");
 	},
-	a: ({ input, id }) => {
-		if (input.selectionStart === null) return;
-
-		const caret = input.selectionStart + 1;
-		input.setSelectionRange(caret, caret);
+	a: ({ input, id, caret }) => {
+		setCaret(input, caret + 1);
 
 		inputStates[id] = "insert";
 		input.classList.remove("vimput-normal");
@@ -51,26 +48,19 @@ const NORMAL_KEYBINDINGS: Record<
 	},
 	"0": ({ input }) => setCaret(input, 0),
 	$: ({ input }) => setCaret(input, input.value.length),
-	w: ({ input }) => {
-		const caret = input.selectionStart;
-		if (caret === null) return;
-
+	w: ({ input, caret }) => {
 		let nextWord = input.value.indexOf(" ", caret) + 1;
+
 		if (nextWord === 0) return setCaret(input, input.value.length - 1);
 		setCaret(input, nextWord);
 	},
-	b: ({ input }) => {
-		const caret = input.selectionStart;
-		if (caret === null) return;
-
+	b: ({ input, caret }) => {
 		let prevWord = input.value.lastIndexOf(" ", caret - 2) + 1;
+
 		if (prevWord === 0) return setCaret(input, 0);
 		setCaret(input, prevWord);
 	},
-	x: ({ input }) => {
-		const caret = input.selectionStart;
-		if (caret === null) return;
-
+	x: ({ input, caret }) => {
 		input.value = input.value.slice(0, caret) + input.value.slice(caret + 1);
 		setCaret(
 			input,
@@ -89,10 +79,9 @@ for (let i = 0; i < inputs.length; i++) {
 		(e) => {
 			e.stopPropagation();
 
-			if (
-				inputStates[i] === "normal" &&
-				input.selectionStart === input.value.length
-			) {
+			const caret = input.selectionStart || 0;
+
+			if (inputStates[i] === "normal" && caret === input.value.length) {
 				setCaret(input, input.value.length - 1);
 			}
 
@@ -105,7 +94,6 @@ for (let i = 0; i < inputs.length; i++) {
 				e.preventDefault();
 
 				if (inputStates[i] === "insert") {
-					const caret = input.selectionStart;
 					setCaret(input, (caret || 0) - 1);
 
 					input.classList.add("vimput-normal");
@@ -124,7 +112,8 @@ for (let i = 0; i < inputs.length; i++) {
 				key += MODIFIERS[modifier];
 			key += e.key;
 
-			if (key in NORMAL_KEYBINDINGS) NORMAL_KEYBINDINGS[key]({ input, id: i });
+			if (key in NORMAL_KEYBINDINGS)
+				NORMAL_KEYBINDINGS[key]({ input, id: i, caret });
 		},
 		{ capture: true }
 	);
