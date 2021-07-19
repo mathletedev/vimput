@@ -2,6 +2,8 @@
 
 > Vim emulation in browsers
 
+![vimput_128](https://user-images.githubusercontent.com/63214683/126087031-1f58fec7-f737-45b9-a2e6-05dfea89a846.png)
+
 ## Installation (Source Code)
 
 - Go to [the releases page](https://github.com/mathletedev/vimput/releases) and click on `vimput-x.y.z.zip`
