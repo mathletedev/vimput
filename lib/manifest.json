@@ -9,5 +9,10 @@
 			"js": ["index.js"],
 			"css": ["styles.css"]
 		}
-	]
+	],
+	"icons": {
+		"16": "img/vimput_16.png",
+		"48": "img/vimput_48.png",
+		"128": "img/vimput_128.png"
+	}
 }
