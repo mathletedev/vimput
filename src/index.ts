@@ -4,12 +4,6 @@ const inputs = <NodeListOf<HTMLInputElement>>(
 
 let inputStates: Record<number, "normal" | "insert"> = {};
 
-const MODIFIERS: Record<string, string> = {
-	Control: "^"
-};
-
-let pressedModifiers = new Set<string>();
-
 const moveCaret = (input: HTMLInputElement, distance: number) => {
 	const caret = input.selectionStart;
 	if (
@@ -77,20 +71,13 @@ for (let i = 0; i < inputs.length; i++) {
 	input.addEventListener(
 		"keydown",
 		(e) => {
-			e.stopPropagation();
-
 			const caret = input.selectionStart || 0;
 
-			if (inputStates[i] === "normal" && caret === input.value.length) {
+			if (inputStates[i] === "normal" && caret === input.value.length)
 				setCaret(input, input.value.length - 1);
-			}
-
-			if (Object.keys(MODIFIERS).includes(e.key)) {
-				pressedModifiers.add(e.key);
-				return;
-			}
 
 			if (e.key === "Escape") {
+				e.stopPropagation();
 				e.preventDefault();
 
 				if (inputStates[i] === "insert") {
@@ -106,22 +93,9 @@ for (let i = 0; i < inputs.length; i++) {
 			if (inputStates[i] === "insert") return;
 			e.preventDefault();
 
-			let key = "";
-
-			for (const modifier of Array.from(pressedModifiers).sort())
-				key += MODIFIERS[modifier];
-			key += e.key;
-
-			if (key in NORMAL_KEYBINDINGS)
-				NORMAL_KEYBINDINGS[key]({ input, id: i, caret });
+			if (e.key in NORMAL_KEYBINDINGS)
+				NORMAL_KEYBINDINGS[e.key]({ input, id: i, caret });
 		},
 		{ capture: true }
 	);
-
-	input.addEventListener("keyup", (e) => {
-		if (Object.keys(MODIFIERS).includes(e.key)) {
-			pressedModifiers.delete(e.key);
-			return;
-		}
-	});
 }
